@@ -1,47 +1,54 @@
 package com.wasteless.backend.service;
 
+import com.wasteless.backend.config.JwtUtil;
 import com.wasteless.backend.dto.AuthResponse;
-import com.wasteless.backend.dto.LoginRequest;
-import com.wasteless.backend.dto.RegisterRequest;
 import com.wasteless.backend.model.User;
 import com.wasteless.backend.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
+    private final AuthenticationManager authenticationManager;
 
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-    public AuthResponse register(RegisterRequest request){
-        if (userRepository.existsByEmail(request.getEmail())) {
-            return new AuthResponse("Email already registered!", null);
+    public ResponseEntity<?> register(User user) {
+        if (userRepository.existsByEmail(user.getEmail())) {
+            return ResponseEntity.badRequest().body("Email already exists");
         }
 
-        User user = User.builder()
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .fullName(request.getFullName())
-                .build();
-
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
 
-        return new AuthResponse("Registration successful!", null);
+        String token = jwtUtil.generateToken(user.getEmail());
+        return ResponseEntity.ok(new AuthResponse(token));
     }
 
-    public  AuthResponse login(LoginRequest request){
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElse(null);
+    public ResponseEntity<?> login(String email, String password) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(email, password)
+            );
 
-        if(user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-        return new AuthResponse("Invalid credentials!", null);
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            String token = jwtUtil.generateToken(user.getEmail());
+
+            return ResponseEntity.ok(new AuthResponse(token));
+
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(401).body("Invalid credentials");
         }
-
-        //Later, we'll generate a JWT token here
-        return new AuthResponse("Login successful!", "dummy-token");
     }
 }
