@@ -28,10 +28,11 @@ public class AuthService {
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
-        String token = jwtUtil.generateToken(user.getEmail());
-        return ResponseEntity.ok(new AuthResponse(token));
+        String token = jwtUtil.generateToken(savedUser.getEmail());
+        AuthResponse response = new AuthResponse(token, savedUser.getId(), savedUser.getEmail(), savedUser.getFullName());
+        return ResponseEntity.ok(response);
     }
 
     public ResponseEntity<?> login(String email, String password) {
@@ -44,8 +45,9 @@ public class AuthService {
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             String token = jwtUtil.generateToken(user.getEmail());
+            AuthResponse response = new AuthResponse(token, user.getId(), user.getEmail(), user.getFullName());
 
-            return ResponseEntity.ok(new AuthResponse(token));
+            return ResponseEntity.ok(response);
 
         } catch (AuthenticationException e) {
             return ResponseEntity.status(401).body("Invalid credentials");
