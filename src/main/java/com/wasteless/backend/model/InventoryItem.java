@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -26,7 +27,20 @@ public class InventoryItem {
 
     private String storageLocation; // e.g., "Fridge", "Freezer", "Pantry"
 
+    @Enumerated(EnumType.STRING)
+    private ItemStatus status = ItemStatus.ACTIVE; // Default to ACTIVE
+
+    private LocalDateTime consumedAt; // When item was marked as eaten/wasted
+
+    private Double estimatedValue; // Estimated value in Naira for impact calculations
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    public enum ItemStatus {
+        ACTIVE,   // Still in inventory
+        EATEN,    // Successfully consumed
+        WASTED    // Thrown away/expired
+    }
 }
