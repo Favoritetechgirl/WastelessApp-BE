@@ -27,5 +27,5 @@ public class ExpirationRecord {
     @Enumerated(EnumType.STRING)
     private ExpirationStatus status;
 
-    private boolean notified; // tracks if a reminder has already been sent
+    private boolean notified; // track if a reminder has already been sent
 }
