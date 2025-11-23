@@ -10,7 +10,7 @@ import java.time.temporal.ChronoUnit;
 @AllArgsConstructor
 @Builder
 public class InventoryResponse {
-    private Long id;
+    private Long inventoryItemId;
     private String name;
     private int quantity;
     private String category;
@@ -27,7 +27,7 @@ public class InventoryResponse {
         }
 
         return InventoryResponse.builder()
-                .id(item.getId())
+                .inventoryItemId(item.getInventoryItemId())
                 .name(item.getName())
                 .quantity(item.getQuantity())
                 .category(item.getCategory())

@@ -15,7 +15,7 @@ public class InventoryItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long inventoryItemId;
 
     private String name;
     private int quantity;
