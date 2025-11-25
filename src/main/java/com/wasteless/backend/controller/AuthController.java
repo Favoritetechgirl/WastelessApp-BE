@@ -31,6 +31,19 @@ public class AuthController {
         return authService.login(user.getEmail(), user.getPassword());
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader(value="Authorization", required = false) String token){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()){
+            String email = authentication.getName();
+        }
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Logged out successfully");
+
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
