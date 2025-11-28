@@ -23,7 +23,10 @@ public class ImpactHistoryResponse {
     public static class MonthlyImpact {
         private String month;              // e.g., "January 2024"
         private Double moneySaved;
+        private Double moneyWasted;
+        private Double netImpact;
         private Double co2Saved;
+        private Integer itemsEaten;
         private Integer itemsSaved;
         private Integer itemsWasted;
         private Double wasteReductionPercentage;

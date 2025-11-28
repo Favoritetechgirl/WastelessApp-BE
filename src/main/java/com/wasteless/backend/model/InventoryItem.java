@@ -1,5 +1,6 @@
 package com.wasteless.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,6 +35,7 @@ public class InventoryItem {
 
     private Double estimatedValue; // Estimated value in Naira for impact calculations
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;

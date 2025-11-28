@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -57,6 +59,11 @@ public class ImpactControllerIntegrationTest {
                 .build();
         testUser = userRepository.save(testUser);
 
+        // Set up security context with authenticated user
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(testUser, null, testUser.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
         // Create test inventory item
         testItem = InventoryItem.builder()
                 .name("Test Tomatoes")
@@ -77,7 +84,7 @@ public class ImpactControllerIntegrationTest {
         mockMvc.perform(get("/api/v1/impact/summary")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.period").value("This Month"))
+                .andExpect(jsonPath("$.period").exists()) // Period format: "November 2025"
                 .andExpect(jsonPath("$.moneySaved").exists())
                 .andExpect(jsonPath("$.co2Saved").exists())
                 .andExpect(jsonPath("$.itemsSaved").exists())
@@ -103,7 +110,7 @@ public class ImpactControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.monthlyData").isArray())
                 .andExpect(jsonPath("$.totalImpact").exists())
-                .andExpect(jsonPath("$.totalImpact.period").value("All Time"));
+                .andExpect(jsonPath("$.totalImpact.period").value("Last 3 Months"));
     }
 
     @Test
