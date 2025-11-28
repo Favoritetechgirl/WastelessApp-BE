@@ -63,7 +63,13 @@ public class DonationService {
         List<DonationCenter> centers = donationCenterRepository.findByIsActiveTrue();
         return centers.stream()
                 .map(center -> mapToResponse(center, userLat, userLon))
-                .sorted((a, b) -> Double.compare(a.getDistanceKm(), b.getDistanceKm()))
+                .sorted((a, b) -> {
+                    // Handle null distances - put nulls at the end
+                    if (a.getDistanceKm() == null && b.getDistanceKm() == null) return 0;
+                    if (a.getDistanceKm() == null) return 1;
+                    if (b.getDistanceKm() == null) return -1;
+                    return Double.compare(a.getDistanceKm(), b.getDistanceKm());
+                })
                 .collect(Collectors.toList());
     }
 

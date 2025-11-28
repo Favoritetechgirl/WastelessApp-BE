@@ -8,7 +8,10 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "donation_centers")
+@Table(name = "donation_centers",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"name", "address", "city"})
+        })
 public class DonationCenter {
 
     @Id

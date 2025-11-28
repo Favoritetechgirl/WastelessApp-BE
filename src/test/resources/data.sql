@@ -1,6 +1,9 @@
 -- Sample Donation Centers in Nigeria
 -- This file will be executed on application startup (for development/demo purposes)
 
+-- Clear existing data to prevent duplicates
+DELETE FROM donation_centers;
+
 -- Lagos Donation Centers
 INSERT INTO donation_centers (name, type, address, city, state, latitude, longitude, phone_number, email, opening_hours, accepted_items, is_active, website)
 VALUES
