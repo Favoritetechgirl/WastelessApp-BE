@@ -8,11 +8,13 @@ import com.wasteless.backend.model.User;
 import com.wasteless.backend.service.ImpactService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/impact")
 @RequiredArgsConstructor
@@ -28,9 +30,16 @@ public class ImpactController {
     public ResponseEntity<ImpactSummaryResponse> getCurrentMonthSummary(
             @AuthenticationPrincipal UserDetails userDetails
     ) {
-        User user = (User) userDetails;
-        ImpactSummaryResponse summary = impactService.getCurrentMonthSummary(user);
-        return ResponseEntity.ok(summary);
+        log.info("Fetching impact summary for user: {}", userDetails != null ? userDetails.getUsername() : "null");
+        try {
+            User user = (User) userDetails;
+            ImpactSummaryResponse summary = impactService.getCurrentMonthSummary(user);
+            log.info("Impact summary retrieved successfully for user: {}", user.getEmail());
+            return ResponseEntity.ok(summary);
+        } catch (Exception e) {
+            log.error("Error fetching impact summary: ", e);
+            throw e;
+        }
     }
 
     /**
@@ -43,6 +52,45 @@ public class ImpactController {
     ) {
         User user = (User) userDetails;
         ImpactSummaryResponse summary = impactService.getLast30DaysSummary(user);
+        return ResponseEntity.ok(summary);
+    }
+
+    /**
+     * GET /api/v1/impact/summary/week
+     * Get current week's impact summary
+     */
+    @GetMapping("/summary/week")
+    public ResponseEntity<ImpactSummaryResponse> getWeekSummary(
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        User user = (User) userDetails;
+        ImpactSummaryResponse summary = impactService.getWeekSummary(user);
+        return ResponseEntity.ok(summary);
+    }
+
+    /**
+     * GET /api/v1/impact/summary/year
+     * Get current year's impact summary
+     */
+    @GetMapping("/summary/year")
+    public ResponseEntity<ImpactSummaryResponse> getYearSummary(
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        User user = (User) userDetails;
+        ImpactSummaryResponse summary = impactService.getYearSummary(user);
+        return ResponseEntity.ok(summary);
+    }
+
+    /**
+     * GET /api/v1/impact/summary/all
+     * Get all-time impact summary
+     */
+    @GetMapping("/summary/all")
+    public ResponseEntity<ImpactSummaryResponse> getAllTimeSummary(
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        User user = (User) userDetails;
+        ImpactSummaryResponse summary = impactService.getAllTimeSummary(user);
         return ResponseEntity.ok(summary);
     }
 

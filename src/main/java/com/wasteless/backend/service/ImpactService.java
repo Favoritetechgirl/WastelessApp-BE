@@ -57,6 +57,39 @@ public class ImpactService {
     }
 
     /**
+     * Get current week's impact summary
+     */
+    public ImpactSummaryResponse getWeekSummary(User user) {
+        LocalDate now = LocalDate.now();
+        LocalDateTime startOfWeek = now.minusDays(now.getDayOfWeek().getValue() - 1).atStartOfDay();
+        LocalDateTime endOfWeek = LocalDateTime.now();
+
+        return calculateImpactForPeriod(user, startOfWeek, endOfWeek, "This Week");
+    }
+
+    /**
+     * Get current year's impact summary
+     */
+    public ImpactSummaryResponse getYearSummary(User user) {
+        LocalDateTime startOfYear = LocalDate.now().withDayOfYear(1).atStartOfDay();
+        LocalDateTime now = LocalDateTime.now();
+
+        String period = String.valueOf(LocalDate.now().getYear());
+        return calculateImpactForPeriod(user, startOfYear, now, period);
+    }
+
+    /**
+     * Get all-time impact summary
+     */
+    public ImpactSummaryResponse getAllTimeSummary(User user) {
+        // Get the earliest item date or use a very early date
+        LocalDateTime startDate = LocalDateTime.of(2020, 1, 1, 0, 0);
+        LocalDateTime now = LocalDateTime.now();
+
+        return calculateImpactForPeriod(user, startDate, now, "All Time");
+    }
+
+    /**
      * Get historical impact data (monthly breakdown)
      */
     public ImpactHistoryResponse getImpactHistory(User user, int months) {
@@ -116,28 +149,25 @@ public class ImpactService {
             LocalDateTime endDate,
             String period
     ) {
-        // Get all items consumed/wasted in this period
-        List<InventoryItem> consumedItems = inventoryRepository.findAll().stream()
-                .filter(item -> item.getUser().getId().equals(user.getId()))
-                .filter(item -> item.getConsumedAt() != null)
-                .filter(item -> !item.getConsumedAt().isBefore(startDate))
-                .filter(item -> !item.getConsumedAt().isAfter(endDate))
-                .toList();
+        // Get all items consumed/wasted in this period using efficient query
+        List<InventoryItem> consumedItems = inventoryRepository.findConsumedItemsByUserAndDateRange(
+                user, startDate, endDate
+        );
 
-        // Separate eaten and wasted items
+        // Separate eaten/donated (saved) and wasted items
         List<InventoryItem> eatenItems = consumedItems.stream()
-                .filter(item -> item.getStatus() == InventoryItem.ItemStatus.EATEN)
+                .filter(item -> item.getStatus() == InventoryItem.ItemStatus.EATEN ||
+                        item.getStatus() == InventoryItem.ItemStatus.DONATED)
                 .toList();
 
         List<InventoryItem> wastedItems = consumedItems.stream()
                 .filter(item -> item.getStatus() == InventoryItem.ItemStatus.WASTED)
                 .toList();
 
-        // Get active items (not consumed) for this user
-        List<InventoryItem> activeItems = inventoryRepository.findAll().stream()
-                .filter(item -> item.getUser().getId().equals(user.getId()))
-                .filter(item -> item.getStatus() == InventoryItem.ItemStatus.ACTIVE)
-                .toList();
+        // Get active items (not consumed) for this user using efficient query
+        List<InventoryItem> activeItems = inventoryRepository.findByUserAndStatus(
+                user, InventoryItem.ItemStatus.ACTIVE
+        );
 
         // Calculate financial impact
         double moneySaved = calculateTotalValue(eatenItems);

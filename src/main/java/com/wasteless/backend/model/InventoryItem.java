@@ -21,12 +21,27 @@ public class InventoryItem {
 
     private String name;
     private int quantity;
+    private String unit; // e.g., "pieces", "kg", "g", "lbs"
     private String category;
 
     private LocalDate purchaseDate;
     private LocalDate expiryDate;
 
     private String storageLocation; // e.g., "Fridge", "Freezer", "Pantry"
+
+    // Package information
+    private Integer packageSize;
+    private String packageUnit;
+
+    // Spoilage tracking
+    private Boolean spoilsAfterOpening;
+    private Boolean isOpened;
+    private LocalDate dateOpened;
+    private Integer daysUntilSpoilage;
+
+    // Image
+    @Column(columnDefinition = "TEXT")
+    private String imageUrl; // Base64 encoded image or URL
 
     @Enumerated(EnumType.STRING)
     private ItemStatus status = ItemStatus.ACTIVE; // Default to ACTIVE
@@ -43,6 +58,7 @@ public class InventoryItem {
     public enum ItemStatus {
         ACTIVE,   // Still in inventory
         EATEN,    // Successfully consumed
-        WASTED    // Thrown away/expired
+        WASTED,   // Thrown away/expired
+        DONATED   // Donated to food bank/shelter
     }
 }
