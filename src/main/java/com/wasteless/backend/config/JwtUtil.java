@@ -44,7 +44,7 @@ public class JwtUtil {
     }
 
     private String createToken(Map<String, Object> claims, String subject) {
-        long expirationTime = 1000 * 60 * 60; // 1 hour
+        long expirationTime = 1000 * 60 * 60 * 24; // 24 hours (increased from 1 hour)
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)

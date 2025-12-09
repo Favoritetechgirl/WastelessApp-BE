@@ -35,10 +35,19 @@ public class InventoryService {
         InventoryItem item = InventoryItem.builder()
                 .name(request.getName())
                 .quantity(request.getQuantity())
+                .unit(request.getUnit())
                 .category(request.getCategory())
                 .purchaseDate(request.getPurchaseDate())
                 .expiryDate(request.getExpiryDate())
                 .storageLocation(request.getStorageLocation())
+                .estimatedValue(request.getEstimatedValue())
+                .packageSize(request.getPackageSize())
+                .packageUnit(request.getPackageUnit())
+                .spoilsAfterOpening(request.getSpoilsAfterOpening())
+                .isOpened(request.getIsOpened())
+                .dateOpened(request.getDateOpened())
+                .daysUntilSpoilage(request.getDaysUntilSpoilage())
+                .imageUrl(request.getImageUrl())
                 .user(user)
                 .build();
 
@@ -57,10 +66,23 @@ public class InventoryService {
 
         existing.setName(request.getName());
         existing.setQuantity(request.getQuantity());
+        existing.setUnit(request.getUnit());
         existing.setCategory(request.getCategory());
         existing.setPurchaseDate(request.getPurchaseDate());
         existing.setExpiryDate(request.getExpiryDate());
         existing.setStorageLocation(request.getStorageLocation());
+        existing.setEstimatedValue(request.getEstimatedValue());
+        existing.setPackageSize(request.getPackageSize());
+        existing.setPackageUnit(request.getPackageUnit());
+        existing.setSpoilsAfterOpening(request.getSpoilsAfterOpening());
+        existing.setIsOpened(request.getIsOpened());
+        existing.setDateOpened(request.getDateOpened());
+        existing.setDaysUntilSpoilage(request.getDaysUntilSpoilage());
+
+        // Only update image if a new one is provided
+        if (request.getImageUrl() != null && !request.getImageUrl().isEmpty()) {
+            existing.setImageUrl(request.getImageUrl());
+        }
 
         return InventoryResponse.fromEntity(inventoryRepository.save(existing));
     }

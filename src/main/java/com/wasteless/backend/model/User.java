@@ -34,7 +34,15 @@ public class User implements UserDetails {
 
     private String fullName;
 
+    private String phone;
+
+    @Column(columnDefinition = "TEXT")
+    private String profilePicture; // Store as base64 or URL
+
     private String role = "USER"; //Default role for now
+
+    @Column(nullable = false)
+    private boolean onboardingCompleted = false;
 
     // UserDetails implementation
     @Override

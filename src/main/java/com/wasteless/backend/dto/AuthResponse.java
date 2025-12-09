@@ -8,13 +8,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthResponse {
-      private String token; //We'll return JWT token later
-      private Long userId;
-      private String email;
-      private String fullName;
+    private String token;
+    private Long userId;
+    private String email;
+    private String fullName;
+    private String phone;
+    private String profilePicture;
+    private boolean onboardingCompleted;
 
-      public AuthResponse (String token) {
-          this.token = token;
-      }
+    public AuthResponse (String token) {
+        this.token = token;
+    }
 
 }
