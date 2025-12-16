@@ -5,9 +5,9 @@ services:
     image: postgres:15-alpine
     container_name: wasteless-postgres
     environment:
-      POSTGRES_DB: wasteless_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: pelunmi
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -25,20 +25,20 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      SPRING_PROFILES_ACTIVE: production
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/wasteless_db
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: pelunmi
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      JWT_SECRET: YourSuperSecretKeyThatShouldBeLongEnoughForHS256ChangeThisInProduction
-      JWT_EXPIRATION: 86400000
-      SPOONACULAR_API_KEY: 46e8627295314894b610e4ec2cac7658
-      SPOONACULAR_API_BASE_URL: https://api.spoonacular.com
-      PORT: 8080
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION}
+      SPOONACULAR_API_KEY: ${SPOONACULAR_API_KEY}
+      SPOONACULAR_API_BASE_URL: ${SPOONACULAR_API_BASE_URL}
+      PORT: ${PORT}
     ports:
-      - "8080:8080"
+      - "${PORT}:${PORT}"
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:${PORT}/actuator/health"]
       interval: 30s
       timeout: 10s
       retries: 3

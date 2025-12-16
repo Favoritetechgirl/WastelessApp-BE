@@ -30,5 +30,9 @@ build/
 !**/src/test/**/build/
 src/main/resources/application.properties
 
+### Environment Variables ###
+.env
+
 ### VS Code ###
 .vscode/
+
