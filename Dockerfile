@@ -1,4 +1,4 @@
-editable# Build stage
+# Build stage
 FROM maven:3.9-eclipse-temurin-17-alpine AS build
 WORKDIR /app
 

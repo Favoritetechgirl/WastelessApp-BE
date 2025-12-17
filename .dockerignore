@@ -28,8 +28,6 @@ Thumbs.db
 HELP.md
 
 # Docker
-Dockerfile
-.dockerignore
 docker-compose.yml
 
 # Render
